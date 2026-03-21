@@ -2,44 +2,29 @@ using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections.Generic;
 
-public class PieceManager : MonoBehaviour // 기술적인 것을 위해서 오브젝트 풀링을 구현하도록
+public class PieceManager : MonoBehaviour
 {
     public enum PieceType { Pawn, Rook, Knight, Bishop, Queen, King, END }
 
     // ==============================================================================
-    // Unity FrameCycle Methods
+    // constructor/Initializer
     // ==============================================================================
+
+    public void Awake()
+    {
+        CreateBasicPool();
+    }
 
     public void Start()
     {
         boardStatus = gameObject.GetComponent<BoardManager>().LinkBoard();
-        BlackPawnPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackPawnPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        BlackRookPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackRookPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        BlackQueenPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackQueenPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        BlackBishopPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackBishopPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        BlackKnightPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackKnightPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        whitePawnPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whitePawnPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        whiteRookPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteRookPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        whiteQueenPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteQueenPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        whiteBishopPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteBishopPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        whiteKnightPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteKnightPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
-        Initialize();
+        //Initialize();
     }
-
-    // ==============================================================================
-    // Methods
-    // ==============================================================================
 
     public void Initialize()
     {
         Get(PieceType.King, boardStatus[4, 7], false);
         Get(PieceType.King, boardStatus[3, 0], true);
-        //if (BlackKing == null)
-        //    BlackKing = Instantiate(BlackKingPrefab);
-        //BlackKing.GetComponent<King>().Initialize(boardStatus[4, 7], true);
-        //if (whiteKing == null)
-        //    whiteKing = Instantiate(whiteKingPrefab);
-        //whiteKing.GetComponent<King>().Initialize(boardStatus[3, 0], true);
 
         for (int i = 0; i < 8; i++)
         {
@@ -65,6 +50,71 @@ public class PieceManager : MonoBehaviour // 기술적인 것을 위해서 오브젝트 풀링�
         Get(PieceType.Queen, boardStatus[3, 7], false);
         Get(PieceType.Queen, boardStatus[4, 0], true);
     }
+
+    public void CreateBasicPool()
+    {
+        GameObject output = null;
+
+        BlackPawnPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackPawnPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        BlackRookPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackRookPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        BlackQueenPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackQueenPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        BlackBishopPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackBishopPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        BlackKnightPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackKnightPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        whitePawnPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whitePawnPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        whiteRookPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteRookPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        whiteQueenPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteQueenPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        whiteBishopPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteBishopPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+        whiteKnightPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteKnightPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
+
+        for (int i = 0; i < 8; i++)
+        {
+            BlackPawnPool.Get(out output);
+            BlackPawnPool.Release(output);
+            whitePawnPool.Get(out output);
+            whitePawnPool.Release(output);
+        }
+
+        BlackRookPool.Get(out output);
+        BlackRookPool.Release(output);
+        BlackRookPool.Get(out output);
+        BlackRookPool.Release(output);
+        whiteRookPool.Get(out output);
+        whiteRookPool.Release(output);
+        whiteRookPool.Get(out output);
+        whiteRookPool.Release(output);
+        BlackKnightPool.Get(out output);
+        BlackKnightPool.Release(output);
+        BlackKnightPool.Get(out output);
+        BlackKnightPool.Release(output);
+        whiteKnightPool.Get(out output);
+        whiteKnightPool.Release(output);
+        whiteKnightPool.Get(out output);
+        whiteKnightPool.Release(output);
+        BlackBishopPool.Get(out output);
+        BlackBishopPool.Release(output);
+        BlackBishopPool.Get(out output);
+        BlackBishopPool.Release(output);
+        whiteBishopPool.Get(out output);
+        whiteBishopPool.Release(output);
+        whiteBishopPool.Get(out output);
+        whiteBishopPool.Release(output);
+
+        BlackQueenPool.Get(out output);
+        BlackQueenPool.Release(output);
+        whiteQueenPool.Get(out output);
+        whiteQueenPool.Release(output);
+
+        if (BlackKing == null)
+            BlackKing = Instantiate(BlackKingPrefab);
+        BlackKing.SetActive(false);
+        if (whiteKing == null)
+            whiteKing = Instantiate(whiteKingPrefab);
+        whiteKing.SetActive(false);
+    }
+
+    // ==============================================================================
+    // Methods
+    // ==============================================================================
 
 
     public GameObject Get(PieceType type, Tile spawnLocation, bool black)
@@ -120,6 +170,7 @@ public class PieceManager : MonoBehaviour // 기술적인 것을 위해서 오브젝트 풀링�
                         whiteKing = Instantiate(whiteKingPrefab);
                     output = whiteKing;
                 }
+                output.SetActive(true);
                 output.GetComponent<King>().Initialize(spawnLocation, black);
                 break;
             default:
@@ -127,6 +178,7 @@ public class PieceManager : MonoBehaviour // 기술적인 것을 위해서 오브젝트 풀링�
         }
         return output;
     }
+
 
     public void Release(GameObject target)
     {

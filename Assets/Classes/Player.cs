@@ -1,33 +1,53 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
-    void Start()
+    public enum NetworkState
     {
-        groundLayer = LayerMask.GetMask("Board");
-        Hover = BoardManager.GetInstance().Hover;
+        local,
+        Multi_Host,
+        Multi_Guest,
+        END
     }
 
-    void Update()
+    public bool Initialize(bool _isBlack)
     {
-
-        if (Selected != null)
+        isBlack = _isBlack;
+        if (!isBlack)
         {
-            Selected.transform.position = position;
+            GameObject arm = GameObject.Find("Arm");
+            arm.transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+
+        return true;
+    }
+
+    private void Start()
+    {
+        groundLayer = LayerMask.GetMask("Board");
+        Hover = GameMaster.GetInstance().GetBoard().Hover;
+        PlacePiece = GameMaster.GetInstance().Place;
+        Initialize(false);
+    }
+
+    private void Update()
+    {
+        if (SelectedPiece != null)
+        {
+            SelectedPiece.gameObject.transform.position = position;
             SelectedPiece.HighlightTile();
 
             if (Mouse.current.rightButton.wasPressedThisFrame)
                 Deselect();
             else if (Mouse.current.leftButton.wasPressedThisFrame)
-                Place();
+                RequestMove();
         }
         else
         {
             if (Mouse.current.leftButton.wasPressedThisFrame) // 인풋 시스템이 fixed update에 들어가면 제대로 클릭 감지를 못함. fixed update 메커니즘 때문인듯
                 Select();
-
         }
     }
     private void FixedUpdate()
@@ -35,12 +55,16 @@ public class Player : MonoBehaviour
         Hovering();
     }
 
+
     private bool Raycast(out Tile output)
     {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Vector3 mousePosition = Vector3.zero;
+        Vector2 mouse = Mouse.current.position.ReadValue();
+        mousePosition.x = mouse.x;
+        mousePosition.y = mouse.y;
         output = null;
 
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(new Vector3(mousePos.x, mousePos.y, 0f)), out RaycastHit hit, 100f, groundLayer))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePosition), out RaycastHit hit, 100f, groundLayer))
         {
             if (hit.collider.CompareTag("Board"))
                 output = hit.transform.gameObject.GetComponent<Tile>();
@@ -51,21 +75,20 @@ public class Player : MonoBehaviour
         return output != null;
     }
 
-    private bool Place()
+    private void RequestMove()
     {
         if (HoveringTile.GetState() != Tile.Status.Select)
-            return false;
+            return;
 
-        if (HoveringTile.SetPiece(SelectedPiece))
-        {
-            SelectedPiece.DeHighlightTile();
-            SelectedPiece.TileSearch();
-            Selected = null;
-            SelectedTile = null;
-            SelectedPiece = null;
-            return true;
-        }
-        return false;
+        GameMaster.GetInstance().RequestMove(HoveringTile, SelectedTile);
+    }
+
+    public void Place()
+    {
+        SelectedPiece.DeHighlightTile();
+        SelectedPiece.TileSearch();
+        SelectedTile = null;
+        SelectedPiece = null;
     }
 
     private void Hovering()
@@ -78,24 +101,23 @@ public class Player : MonoBehaviour
 
     private void Deselect()
     {
-        Selected.transform.position = SelectedTile.gameObject.transform.position;
+        SelectedPiece.gameObject.transform.position = SelectedTile.gameObject.transform.position;
         SelectedPiece.DeHighlightTile();
-        Selected = null;
         SelectedTile = null;
         SelectedPiece = null;
     }
     private void Select()
     {
-        if (Selected != null || HoveringTile == null || HoveringTile.GetPiece() == null)
+        if (HoveringTile == null || HoveringTile.GetPiece() == null)
             return;
         SelectedTile = HoveringTile;
         SelectedPiece = HoveringTile.GetPiece();
-        Selected = SelectedPiece.gameObject;
 
         HoveringTile.GetPiece().TileSearch();
     }
 
-    [SerializeField] private GameObject Selected = null;
+
+
     [SerializeField] private Piece SelectedPiece = null;
     [SerializeField] private Tile SelectedTile = null;
     [SerializeField] private Tile HoveringTile = null;
@@ -103,7 +125,9 @@ public class Player : MonoBehaviour
 
     delegate void HoverPointer(Tile tile);
     private HoverPointer Hover;
-
+    delegate bool PlaceMethod(Tile HoveringTile, Tile SelectedTile);
+    private PlaceMethod PlacePiece;
+    private bool isBlack;
     private int groundLayer;
 
 

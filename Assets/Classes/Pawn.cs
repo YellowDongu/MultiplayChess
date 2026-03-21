@@ -30,7 +30,7 @@ public class Pawn : Piece
         {
             for (int i = 1; i < 3; i++)
             {
-                Tile tile = manager.GetTile(position.x, position.y + i);
+                Tile tile = GetTile(position.x, position.y + i);
                 if (tile == null || tile.GetPiece() != null)
                     break;
 
@@ -44,7 +44,7 @@ public class Pawn : Piece
         {
             for (int i = 1; i < 3; i++)
             {
-                Tile tile = manager.GetTile(position.x, position.y - i);
+                Tile tile = GetTile(position.x, position.y - i);
                 if (tile == null || tile.GetPiece() != null)
                     break;
 
@@ -58,7 +58,7 @@ public class Pawn : Piece
 
     private void TileSearch(int x, int y)
     {
-        Tile tile = manager.GetTile(x, y);
+        Tile tile = GetTile(x, y);
         if (tile == null)
             return;
         if (tile.GetPiece() == null || tile.GetPiece().isBlack == isBlack)

@@ -33,11 +33,11 @@ public class King : Piece
         {
             x = position.x + _x;
             y = position.y + _y;
-            tile = manager.GetTile(x, y);
+            tile = GetTile(x, y);
             if (tile == null)
                 continue;
 
-            if (tile.GetPiece() == null || tile.GetPiece().isBlack == isBlack)
+            if (tile.GetPiece() != null && tile.GetPiece().isBlack == isBlack)
                 continue;
 
             moveableTiles.Add(tile);

@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Queen : Piece
 {
@@ -40,7 +38,7 @@ public class Queen : Piece
                 x += _x;
                 y += _y;
 
-                tile = manager.GetTile(x, y);
+                tile = GetTile(x, y);
                 if (tile == null)
                     break;
                 if (tile.GetPiece() != null)

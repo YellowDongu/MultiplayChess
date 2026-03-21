@@ -39,7 +39,7 @@ public class Bishop : Piece
                 x += _x;
                 y += _y;
 
-                tile = manager.GetTile(x, y);
+                tile = GetTile(x, y);
                 if (tile == null)
                     break;
                 if (tile.GetPiece() != null)

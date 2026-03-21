@@ -41,7 +41,7 @@ public class Tile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (status == Status.None)
                 status = Status.Highlight;
@@ -77,24 +77,6 @@ public class Tile : MonoBehaviour
         }
     }
 
-    public bool SetPiece(Piece next)
-    {
-        if (next == null)
-            return false;
-
-        if (piece != null)
-        {
-            if (next.isBlack == piece.isBlack)
-                return false;
-
-            piece.Release();
-        }
-
-        piece = next;
-        piece.gameObject.transform.position = gameObject.transform.position;
-        piece.SetPosition(this);
-        return true;
-    }
 
     public void ReleasePiece()
     {
@@ -110,6 +92,7 @@ public class Tile : MonoBehaviour
     public Vector2Int GetPosition() { return position; }
     public Piece GetPiece() { return piece; }
     public Status GetState() { return status; }
+    public void SetPiece(Piece next) { piece = next; }
     public void SetState(Status next) { if (status == next) return; status = next; SetRender(); }
 
     // ==============================================================================

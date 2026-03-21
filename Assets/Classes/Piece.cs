@@ -11,37 +11,25 @@ abstract public class Piece : MonoBehaviour
     virtual public bool Initialize(Tile tile, bool black)
     {
         bool output = initiated;
+        BoardManager boardManager = GameMaster.GetInstance().GetBoard();
+
         if (!output)
         {
-            manager = BoardManager.GetInstance();
-            if (manager == null)
+            if (boardManager == null)
             {
                 Destroy(this.gameObject);
                 Debug.Log("[ERROR]  NO BOARD IN THIS GAME!");
             }
 
-            PieceManager pieceManager = manager.gameObject.GetComponent<PieceManager>();
+            PieceManager pieceManager = boardManager.gameObject.GetComponent<PieceManager>();
             release = pieceManager.Release;
+            GetTile = boardManager.GetTile;
             initiated = true;
         }
 
-        position = tile.GetPosition();
-        tile.SetPiece(this);
+        boardManager.SetPiece(tile, this);
         isBlack = black;
         return output;
-    }
-
-
-    // ==============================================================================
-    // Unity FrameCycle Methods
-    // ==============================================================================
-    private void Start()
-    {
-    }
-
-    private void Update()
-    {
-        
     }
 
     // ==============================================================================
@@ -52,14 +40,23 @@ abstract public class Piece : MonoBehaviour
         if (tile == null)
             return false;
 
-        foreach (Tile item in moveableTiles)
+        if (CanMove(tile.GetPosition()))
         {
-            if (item != tile)
-                continue;
-
             position = tile.GetPosition();
             moveableTiles.Clear();
             gameObject.transform.position = tile.gameObject.transform.position;
+
+            return true;
+        }
+        return false;
+    }
+    public bool CanMove(Vector2Int position) { return CanMove(GameMaster.GetInstance().GetBoard().GetTile(position)); }
+    public bool CanMove(Tile tile)
+    {
+        foreach (Tile item in moveableTiles)
+        {
+            if (tile != item)
+                continue;
 
             return true;
         }
@@ -93,11 +90,12 @@ abstract public class Piece : MonoBehaviour
     private bool initiated = false;
     public bool isBlack { get; protected set; }
     protected Vector2Int position;
-    protected BoardManager manager = null;
     protected List<Tile> moveableTiles;
     public PieceManager.PieceType type { get; protected set; }
 
-    delegate void ReleasePieceMethod(Piece component);
-    private ReleasePieceMethod release;
+    protected delegate void ReleasePieceMethod(Piece component);
+    protected ReleasePieceMethod release;
+    protected delegate Tile GetTileMethod(int x, int y);
+    protected GetTileMethod GetTile;
 
 }
