@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+
+using static PieceManager;
 
 public class Rook : Piece
 {
@@ -54,6 +56,36 @@ public class Rook : Piece
                 moveableTiles.Add(tile);
             }
         }
+    }
+
+    static public bool Validate((PieceType type, bool isBlack)[,] board, int x, int y, int X, int Y)
+    {
+        if (x == X)
+        {
+            int i = Mathf.Min(y, Y);
+            i += Math.Sign(Y - y);
+
+            for (; i < Y; i++)
+            {
+                if (board[x, i].type != PieceType.END)
+                    return false;
+            }
+
+            return true;
+        }
+        else if (y == Y)
+        {
+            int i = Mathf.Min(x, X);
+            i += Math.Sign(X - x);
+
+            for (; i < X; i++)
+            {
+                if (board[i, y].type != PieceType.END)
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     // ==============================================================================

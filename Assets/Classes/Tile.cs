@@ -22,41 +22,26 @@ public class Tile : MonoBehaviour
     {
         if (initiated)
             return;
-        modelRenderer = GetComponent<Renderer>();
+
         position.x = x;
         position.y = y;
         initiated = true;
+
+#if UNITY_SERVER
+#else
+        modelRenderer = GetComponent<Renderer>();
         SetRender();
+#endif
     }
-
-    // ==============================================================================
-    // Unity FrameCycle Methods
-    // ==============================================================================
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            if (status == Status.None)
-                status = Status.Highlight;
-            else
-                status = Status.None;
-            SetRender();
-        }
-    }
-
 
     // ==============================================================================
     // Methods
     // ==============================================================================
     private void SetRender()
     {
+#if UNITY_SERVER
+        return;
+#endif
         switch (status)
         {
             case Status.Highlight:
@@ -82,11 +67,12 @@ public class Tile : MonoBehaviour
     {
         if (piece != null)
             piece.Release();
+
         piece = null;
     }
 
     // ==============================================================================
-    // variable GetSet Methods
+    // variable & GetSet Methods
     // ==============================================================================
 
     public Vector2Int GetPosition() { return position; }
@@ -94,10 +80,6 @@ public class Tile : MonoBehaviour
     public Status GetState() { return status; }
     public void SetPiece(Piece next) { piece = next; }
     public void SetState(Status next) { if (status == next) return; status = next; SetRender(); }
-
-    // ==============================================================================
-    // variables
-    // ==============================================================================
 
     private bool initiated = false;
     private Vector2Int position;

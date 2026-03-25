@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEngine;
+using static PieceManager;
 
 abstract public class Piece : MonoBehaviour
 {
@@ -77,15 +79,13 @@ abstract public class Piece : MonoBehaviour
     abstract public void TileSearch();
 
     // ==============================================================================
-    // variable GetSet Methods
+    // variable & GetSet Methods
     // ==============================================================================
+
     public Vector2Int GetPosition() { return position; }
     public void SetPosition(Tile tile) { position = tile.GetPosition(); }
     public void Release() { release(this); }
 
-    // ==============================================================================
-    // variables
-    // ==============================================================================
 
     private bool initiated = false;
     public bool isBlack { get; protected set; }

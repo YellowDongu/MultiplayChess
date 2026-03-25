@@ -1,6 +1,5 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.Analytics;
-using UnityEngine.UIElements;
 
 public class BoardManager : MonoBehaviour
 {
@@ -109,6 +108,7 @@ public class BoardManager : MonoBehaviour
 
         return true;
     }
+
     public void SetPiece(Tile to, Piece piece)
     {
         if (piece == null)
@@ -121,6 +121,26 @@ public class BoardManager : MonoBehaviour
         piece.SetPosition(to);
         to.SetPiece(piece);
     }
+
+    public void ReCalculate() { StartCoroutine(CalculateAll()); }
+    public IEnumerator CalculateAll()
+    {
+        Piece piece;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                piece = boardStatus[i, j].GetPiece();
+                if (piece == null)
+                    continue;
+
+                piece.TileSearch();
+                yield return null;
+            }
+        }
+
+    }
+
     private float GetPosition(int index) { return (float)(index - 4) * tilesize + (tilesize * 0.5f); }
 
     public bool Validate(Vector2Int from, Vector2Int to) { return Validate(GetTile(from), GetTile(to)); }
@@ -133,16 +153,13 @@ public class BoardManager : MonoBehaviour
     }
 
     // ==============================================================================
-    // variable GetSet Methods
+    // variable & GetSet Methods
     // ==============================================================================
     public Tile[,] LinkBoard() { return boardStatus; }
     public float tTileSize() { return tilesize; }
     public Tile GetTile(int x, int y) { if (x < 0 || y < 0 || y >= 8 || x >= 8) return null; return boardStatus[x, y]; }
     public Tile GetTile(Vector2Int position) { if (position.x < 0 || position.y < 0 || position.y >= 8 || position.x >= 8) return null; return boardStatus[position.x, position.y]; }
 
-    // ==============================================================================
-    // variables
-    // ==============================================================================
 
     private Tile[,] boardStatus;
     private static BoardManager singleInstance = null;

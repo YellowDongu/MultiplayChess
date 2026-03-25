@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static PieceManager;
 
 public class Pawn : Piece
 {
@@ -64,6 +65,31 @@ public class Pawn : Piece
         if (tile.GetPiece() == null || tile.GetPiece().isBlack == isBlack)
             return;
         moveableTiles.Add(tile);
+    }
+
+    static public bool Validate((PieceType type, bool isBlack)[,] board, int x, int y, int X, int Y)
+    {
+        int differnce = Mathf.Abs(y - Y);
+        if (x != X)
+        {
+            if (differnce > 1 || Mathf.Abs(x - X) > 1)
+                return false;
+
+            return board[X, Y].type != PieceType.END;
+        }
+
+        if (differnce > 2)
+            return false;
+
+        switch (differnce)
+        {
+            case 1:
+                return board[X, Y].type == PieceType.END;
+            case 2:
+                return (board[X, Y + ((Y - y) / 2)].type == PieceType.END) && (board[X, Y].type == PieceType.END);
+            default:
+                return false;
+        }
     }
 
 }

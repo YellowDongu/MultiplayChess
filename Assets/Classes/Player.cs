@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    // ==============================================================================
+    // Enum/Structs
+    // ==============================================================================
     public enum NetworkState
     {
         local,
@@ -11,15 +14,20 @@ public class Player : MonoBehaviour
         END
     }
 
-    public bool Initialize(bool _isBlack)
+    // ==============================================================================
+    // constructor/Initializer
+    // ==============================================================================
+
+    public bool Initialize(bool _isBlack, bool _isLocal)
     {
         isBlack = _isBlack;
+        isLocal = _isLocal;
+        arm.transform.Rotate(0.0f, -arm.transform.eulerAngles.y, 0.0f);
         if (!isBlack)
         {
-            GameObject arm = GameObject.Find("Arm");
             arm.transform.Rotate(0.0f, 180.0f, 0.0f);
         }
-
+        gameObject.SetActive(_isLocal || _isBlack);
 
         return true;
     }
@@ -28,16 +36,14 @@ public class Player : MonoBehaviour
     {
         groundLayer = LayerMask.GetMask("Board");
         Hover = GameMaster.GetInstance().GetBoard().Hover;
-        PlacePiece = GameMaster.GetInstance().Place;
-        Initialize(false);
     }
 
     private void Update()
     {
-        if (SelectedPiece != null)
+        if (selectedPiece != null)
         {
-            SelectedPiece.gameObject.transform.position = position;
-            SelectedPiece.HighlightTile();
+            selectedPiece.gameObject.transform.position = position;
+            selectedPiece.HighlightTile();
 
             if (Mouse.current.rightButton.wasPressedThisFrame)
                 Deselect();
@@ -54,6 +60,10 @@ public class Player : MonoBehaviour
     {
         Hovering();
     }
+
+    // ==============================================================================
+    // Methods
+    // ==============================================================================
 
 
     private bool Raycast(out Tile output)
@@ -77,58 +87,60 @@ public class Player : MonoBehaviour
 
     private void RequestMove()
     {
-        if (HoveringTile.GetState() != Tile.Status.Select)
+        if (hoveringTile.GetState() != Tile.Status.Select)
             return;
 
-        GameMaster.GetInstance().RequestMove(HoveringTile, SelectedTile);
+        GameMaster.GetInstance().RequestMove(hoveringTile, selectedTile);
     }
-
+        
     public void Place()
     {
-        SelectedPiece.DeHighlightTile();
-        SelectedPiece.TileSearch();
-        SelectedTile = null;
-        SelectedPiece = null;
+        selectedPiece.DeHighlightTile();
+        selectedPiece.TileSearch();
+        selectedTile = null;
+        selectedPiece = null;
     }
 
     private void Hovering()
     {
-        if (!Raycast(out HoveringTile))
+        if (!Raycast(out hoveringTile))
             return;
 
-        Hover(HoveringTile);
+        Hover(hoveringTile);
     }
 
     private void Deselect()
     {
-        SelectedPiece.gameObject.transform.position = SelectedTile.gameObject.transform.position;
-        SelectedPiece.DeHighlightTile();
-        SelectedTile = null;
-        SelectedPiece = null;
+        selectedPiece.gameObject.transform.position = selectedTile.gameObject.transform.position;
+        selectedPiece.DeHighlightTile();
+        selectedTile = null;
+        selectedPiece = null;
     }
+
     private void Select()
     {
-        if (HoveringTile == null || HoveringTile.GetPiece() == null)
+        if (hoveringTile == null || hoveringTile.GetPiece() == null)
             return;
-        SelectedTile = HoveringTile;
-        SelectedPiece = HoveringTile.GetPiece();
+        if (!isLocal && hoveringTile.GetPiece().isBlack != isBlack)
+            return;
 
-        HoveringTile.GetPiece().TileSearch();
+        selectedTile = hoveringTile;
+        selectedPiece = hoveringTile.GetPiece();
+
+        hoveringTile.GetPiece().TileSearch();
     }
 
 
-
-    [SerializeField] private Piece SelectedPiece = null;
-    [SerializeField] private Tile SelectedTile = null;
-    [SerializeField] private Tile HoveringTile = null;
+    [SerializeField] GameObject arm;
+    [SerializeField] private Piece selectedPiece = null;
+    [SerializeField] private Tile selectedTile = null;
+    [SerializeField] private Tile hoveringTile = null;
     [SerializeField] Vector3 position;
 
     delegate void HoverPointer(Tile tile);
     private HoverPointer Hover;
-    delegate bool PlaceMethod(Tile HoveringTile, Tile SelectedTile);
-    private PlaceMethod PlacePiece;
     private bool isBlack;
+    private bool isLocal;
     private int groundLayer;
-
 
 }

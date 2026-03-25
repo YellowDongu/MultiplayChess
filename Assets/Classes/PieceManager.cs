@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class PieceManager : MonoBehaviour
 {
+    // ==============================================================================
+    // Enum/Structs
+    // ==============================================================================
     public enum PieceType { Pawn, Rook, Knight, Bishop, Queen, King, END }
 
     // ==============================================================================
@@ -18,11 +21,13 @@ public class PieceManager : MonoBehaviour
     public void Start()
     {
         boardStatus = gameObject.GetComponent<BoardManager>().LinkBoard();
-        //Initialize();
     }
 
     public void Initialize()
     {
+        if(boardStatus == null)
+            boardStatus = gameObject.GetComponent<BoardManager>().LinkBoard();
+
         Get(PieceType.King, boardStatus[4, 7], false);
         Get(PieceType.King, boardStatus[3, 0], true);
 
@@ -229,22 +234,35 @@ public class PieceManager : MonoBehaviour
                 break;
         }
     }
-    public void Restart()
+
+    public void Clear()
     {
+        if (boardStatus == null)
+            boardStatus = gameObject.GetComponent<BoardManager>().LinkBoard();
+
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
                 if (boardStatus[i, j].GetPiece() != null)
+                {
                     Release(boardStatus[i, j].GetPiece());
+                    boardStatus[i, j].SetPiece(null);
+                }
             }
         }
 
-        foreach (var item in WhiteDead)
-            Release(item);
-        foreach (var item in BlackDead)
-            Release(item);
+    }
+    public void Restart()
+    {
+        if (boardStatus == null)
+            boardStatus = gameObject.GetComponent<BoardManager>().LinkBoard();
 
+        //foreach (var item in WhiteDead)
+        //    Release(item);
+        //foreach (var item in BlackDead)
+        //    Release(item);
+        Clear();
         Initialize();
     }
 
@@ -252,6 +270,7 @@ public class PieceManager : MonoBehaviour
     // ==============================================================================
     // variables
     // ==============================================================================
+
     [SerializeField] private GameObject BlackPawnPrefab = null;
     [SerializeField] private GameObject BlackRookPrefab = null;
     [SerializeField] private GameObject BlackQueenPrefab = null;

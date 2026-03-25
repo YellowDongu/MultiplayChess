@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static PieceManager;
 
 public class Bishop : Piece
 {
@@ -54,6 +56,29 @@ public class Bishop : Piece
             }
         }
 
+    }
+
+    static public bool Validate((PieceType type, bool isBlack)[,] board, int x, int y, int X, int Y)
+    {
+        int _x = x, _y = y;
+        int differenceX = X - x, differenceY = Y - y;
+        int absX = Mathf.Abs(differenceX);
+
+        if (absX != Mathf.Abs(differenceY))
+            return false;
+        differenceX = Math.Sign(differenceX);
+        differenceY = Math.Sign(differenceY);
+
+        for (int i = 1; i < absX; i++)
+        {
+            _x += differenceX;
+            _y += differenceY;
+
+            if (board[_x, _y].type != PieceType.END)
+                return false;
+        }
+
+        return true;
     }
 
     // ==============================================================================

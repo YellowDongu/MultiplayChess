@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
+using static PieceManager;
 
 public class Queen : Piece
 {
@@ -53,6 +56,37 @@ public class Queen : Piece
             }
         }
 
+    }
+
+    static public bool Validate((PieceType type, bool isBlack)[,] board, int x, int y, int X, int Y)
+    {
+        if (x == X)
+        {
+            int i = Mathf.Min(y, Y);
+            i += Math.Sign(Y - y);
+
+            for (; i < Y; i++)
+            {
+                if (board[x, i].type != PieceType.END)
+                    return false;
+            }
+
+            return true;
+        }
+        else if (y == Y)
+        {
+            int i = Mathf.Min(x, X);
+            i += Math.Sign(X - x);
+
+            for (; i < X; i++)
+            {
+                if (board[i, y].type != PieceType.END)
+                    return false;
+            }
+            return true;
+        }
+
+        else return Bishop.Validate(board, x, y, X, Y);
     }
 
     // ==============================================================================

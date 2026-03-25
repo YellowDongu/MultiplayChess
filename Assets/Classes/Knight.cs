@@ -42,6 +42,19 @@ public class Knight : Piece
         }
     }
 
+    static public bool Validate(int x, int y, int X, int Y)
+    {
+        foreach ((int _x, int _y) in move)
+        {
+            if ((x + _x) != X)
+                continue;
+            if ((y + _y) == Y)
+                return true;
+        }
+
+        return false;
+    }
+
     // ==============================================================================
     // variables
     // ==============================================================================

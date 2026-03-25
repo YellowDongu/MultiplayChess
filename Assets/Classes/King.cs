@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static PieceManager;
 
 public class King : Piece
 {
@@ -42,6 +43,11 @@ public class King : Piece
 
             moveableTiles.Add(tile);
         }
+    }
+
+    static public bool Validate((PieceType type, bool isBlack)[,] board, int x, int y, int X, int Y)
+    {
+        return (Mathf.Abs(x - X) <= 1) && (Mathf.Abs(y - Y) <= 1);
     }
 
     // ==============================================================================
