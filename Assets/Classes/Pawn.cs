@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using static PieceManager;
 
@@ -29,31 +28,35 @@ public class Pawn : Piece
         moveableTiles.Clear();
         if (isBlack)
         {
-            for (int i = 1; i < 3; i++)
-            {
-                Tile tile = GetTile(position.x, position.y + i);
-                if (tile == null || tile.GetPiece() != null)
-                    break;
-
-                moveableTiles.Add(tile);
-            }
-
             TileSearch(position.x + 1, position.y + 1);
             TileSearch(position.x - 1, position.y + 1);
+
+            Tile tile = GetTile(position.x, position.y + 1);
+            if (tile != null && tile.GetPiece() == null)
+                moveableTiles.Add(tile);
+
+            if(position.y == 1)
+            {
+                tile = GetTile(position.x, position.y + 2);
+                if (tile != null && tile.GetPiece() == null)
+                    moveableTiles.Add(tile);
+            }
         }
         else
         {
-            for (int i = 1; i < 3; i++)
-            {
-                Tile tile = GetTile(position.x, position.y - i);
-                if (tile == null || tile.GetPiece() != null)
-                    break;
-
-                moveableTiles.Add(tile);
-            }
-
             TileSearch(position.x + 1, position.y - 1);
             TileSearch(position.x - 1, position.y - 1);
+
+            Tile tile = GetTile(position.x, position.y - 1);
+            if (tile != null && tile.GetPiece() == null)
+                moveableTiles.Add(tile);
+
+            if (position.y == 6)
+            {
+                tile = GetTile(position.x, position.y - 2);
+                if (tile != null && tile.GetPiece() == null)
+                    moveableTiles.Add(tile);
+            }
         }
     }
 
@@ -86,7 +89,12 @@ public class Pawn : Piece
             case 1:
                 return board[X, Y].type == PieceType.END;
             case 2:
-                return (board[X, Y + ((Y - y) / 2)].type == PieceType.END) && (board[X, Y].type == PieceType.END);
+                if (board[x, y].isBlack && y == 1)
+                    return (board[X, 2].type == PieceType.END) && (board[X, Y].type == PieceType.END);
+                else if (!board[x, y].isBlack && y == 6)
+                    return (board[X, 5].type == PieceType.END) && (board[X, Y].type == PieceType.END);
+                else
+                    return false;
             default:
                 return false;
         }

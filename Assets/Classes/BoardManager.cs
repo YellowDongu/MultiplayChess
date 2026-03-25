@@ -36,9 +36,6 @@ public class BoardManager : MonoBehaviour
         return output;
     }
 
-    // ==============================================================================
-    // Unity FrameCycle Methods
-    // ==============================================================================
     private void Awake()
     {
         if (singleInstance != null)
@@ -141,16 +138,30 @@ public class BoardManager : MonoBehaviour
 
     }
 
-    private float GetPosition(int index) { return (float)(index - 4) * tilesize + (tilesize * 0.5f); }
-
-    public bool Validate(Vector2Int from, Vector2Int to) { return Validate(GetTile(from), GetTile(to)); }
-    public bool Validate(Tile from, Tile to)
+    public void TileClear()
     {
-        if ((from == null || to == null) || from.GetPiece() == null)
-            return false;
-
-        return from.GetPiece().CanMove(to);
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+                boardStatus[i, j].SetState(Tile.Status.None);
     }
+
+    public void Clear()
+    {
+        Piece piece;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                boardStatus[i, j].SetState(Tile.Status.None);
+                piece = boardStatus[i, j].GetPiece();
+                if (piece == null)
+                    continue;
+
+                piece.Release();
+            }
+        }
+    }
+    private float GetPosition(int index) { return (float)(index - 4) * tilesize + (tilesize * 0.5f); }
 
     // ==============================================================================
     // variable & GetSet Methods

@@ -38,6 +38,10 @@ public class Player : MonoBehaviour
         Hover = GameMaster.GetInstance().GetBoard().Hover;
     }
 
+    // ==============================================================================
+    // Unity FrameCycle Methods
+    // ==============================================================================
+
     private void Update()
     {
         if (selectedPiece != null)

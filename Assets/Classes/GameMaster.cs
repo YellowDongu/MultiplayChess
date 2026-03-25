@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms;
@@ -15,7 +16,7 @@ public class GameMaster : MonoBehaviour
     {
         NULL = 0,
         Client,
-        Server,
+        Host,
         END
     }
 
@@ -43,14 +44,19 @@ public class GameMaster : MonoBehaviour
     // Methods
     // ==============================================================================
 
-    public void StartClient() { networkState = NetworkState.Client; client.StartClient(); }
+    public void StartClient()
+    {
+        host.Release();
+        client.StartClient();
+    }
 
     public void StartServer()
     {
-        client.SetIP("127.0.0.1");
-        if (!server.Initialize())
+        client.Release();
+        if (!host.Initialize())
             return;
-        networkState = NetworkState.Server;
+        client.SetIP("127.0.0.1");
+        networkState = NetworkState.Host;
 
     }
 
@@ -61,7 +67,7 @@ public class GameMaster : MonoBehaviour
 
         if (networkState != NetworkState.NULL)
             return;
-        networkState = NetworkState.Client;
+
         client.StartClient();
     }
 
@@ -71,47 +77,48 @@ public class GameMaster : MonoBehaviour
         {
             case NetworkState.NULL:
                 DebugMove(from, to);
-                ReceivedMove(from.GetPosition(), to.GetPosition());
+                ReceivedMove(from.GetPosition(), to.GetPosition(), turn);
                 break;
             case NetworkState.Client:
-                client.Send(from.GetPosition(), to.GetPosition());
+                client.Send(from.GetPosition(), to.GetPosition(), turn);
                 break;
-            case NetworkState.Server:
-                server.SendData(from.GetPosition(), to.GetPosition());
+            case NetworkState.Host:
+                host.Send(from.GetPosition(), to.GetPosition(), turn);
                 break;
             default:
                 break;
         }
     }
 
-    public void ReceivedMove(Vector2Int from, Vector2Int to)
+    public void ReceivedMove(Vector2Int from, Vector2Int to, bool currentTurn)
     {
         Win(to);
         boardManager.MovePiece(from, to);
 
-        if (networkState == NetworkState.NULL)
-        {
-            player.Place();
-            return;
-        }
-
-        if(win != 0)
-        {
-            if (networkState != NetworkState.NULL)
-                player.gameObject.SetActive(false);
-            return;
-        }
-
-        if (isBlack == turn)
+        if (player.gameObject.activeInHierarchy)
             player.Place();
 
-        EndTurn();
-        player.gameObject.SetActive(isBlack == turn);
+        turn = !currentTurn;
         boardManager.ReCalculate();
+
+        if (networkState == NetworkState.NULL)
+            return;
+
+        Log($"{GetPosition(from)} -> {GetPosition(to)}, {(turn ? "흑턴" : "백턴")}");
+        if (win != 0)
+        {
+            sidePanelUI.PanelUnFold();
+            player.gameObject.SetActive(false);
+            EndGame();
+            return;
+        }
+
+        player.gameObject.SetActive(isBlack == turn);
     }
 
     public void StartGame(NetworkState state, bool isLocal, bool _isBlack = true)
     {
+        sidePanelUI.LocalMode(isLocal);
         networkState = state;
         pieceManager.Restart();
         player.Initialize(_isBlack, isLocal);
@@ -120,6 +127,7 @@ public class GameMaster : MonoBehaviour
         isBlack = _isBlack;
         sidePanelUI.PanelFold();
         DebugStart();
+        Log($"매치 시작.");
     }
 
     public void Win(Vector2Int to)
@@ -130,24 +138,99 @@ public class GameMaster : MonoBehaviour
             return;
 
         if (piece.type == PieceManager.PieceType.King)
-            win = (piece.isBlack) ? 1 : -1;
+            win = (piece.isBlack != isBlack) ? 1 : -1;
+    }
+
+    public void EndGame()
+    {
+        switch (networkState)
+        {
+            case NetworkState.Client:
+                sidePanelUI.AfterGamePanelActive(win == 1);
+                break;
+            case NetworkState.Host:
+                sidePanelUI.AfterGamePanelActive(win == 1);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void Rematch()
+    {
+        switch (networkState)
+        {
+            case NetworkState.Client:
+                client.RematchSend(true);
+                break;
+            case NetworkState.Host:
+                host.GetRematch(true, true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void Exitmatch()
+    {
+        switch (networkState)
+        {
+            case NetworkState.Client:
+                client.Release();
+                break;
+            case NetworkState.Host:
+                host.Release();
+                break;
+            default:
+                break;
+        }
+
+        networkState = NetworkState.NULL;
+        player.gameObject.SetActive(false);
+        sidePanelUI.MatchmakingPanelActive();
+        PieceClear();
+    }
+
+    public void LocalStart()
+    {
+        Log("자유 경기 시작.");
+        StartGame(NetworkState.NULL, true, true);
+    }
+
+    public void ConnectionLost()
+    {
+        networkState = NetworkState.NULL;
+        sidePanelUI.MatchmakingPanelActive();
+        Log("상대와 연결이 끊겼습니다.");
+        PieceClear();
+    }
+
+    public void GameOff()
+    {
+        host.Release();
+        client.Release();
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#else
+    Application.Quit();
+#endif
     }
 
     private void DebugStart()
     {
-        return;
+        return; // manual
         gameObject.GetComponent<MovementChecker>().Initialize(true);
     }
     private void DebugMove(Tile from, Tile to)
     {
-        return;
+        return; // manual
         gameObject.GetComponent<MovementChecker>().Move(from.GetPosition().x, from.GetPosition().y, to.GetPosition().x, to.GetPosition().y);
     }
 
-    public void LocalStart() { StartGame(NetworkState.NULL, true, true); }
     public void PieceClear() { pieceManager.Clear(); }
-    private void EndTurn() { turn = !turn; }
-    public void ConnectionLost() { networkState = NetworkState.NULL; PieceClear(); }
+    public void SetNetworkState(NetworkState state) { networkState = state; }
+    public void Log(string text) { logUI.Log(text); }
+    public string GetPosition(Vector2Int position) { return $"{(char)((int)('A') + position.x)}{position.y}"; }
 
     // ==============================================================================
     // variable & GetSet Methods
@@ -165,8 +248,9 @@ public class GameMaster : MonoBehaviour
 
     [SerializeField] private BoardManager boardManager;
     [SerializeField] private PieceManager pieceManager;
-    [SerializeField] private NetworkHandler client;
-    [SerializeField] private ServerHandler server;
+    [SerializeField] private ClientHandler client;
+    [SerializeField] private HostHandler host;
     [SerializeField] private NetworkUI sidePanelUI;
+    [SerializeField] private LogUI logUI;
     [SerializeField] private Player player;
 }

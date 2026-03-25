@@ -58,8 +58,6 @@ public class PieceManager : MonoBehaviour
 
     public void CreateBasicPool()
     {
-        GameObject output = null;
-
         BlackPawnPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackPawnPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
         BlackRookPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackRookPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
         BlackQueenPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(BlackQueenPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
@@ -71,43 +69,17 @@ public class PieceManager : MonoBehaviour
         whiteBishopPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteBishopPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
         whiteKnightPool = new ObjectPool<GameObject>(createFunc: () => Instantiate(whiteKnightPrefab), actionOnGet: obj => obj.SetActive(true), actionOnRelease: obj => obj.SetActive(false), actionOnDestroy: obj => Destroy(obj), maxSize: 10);
 
-        for (int i = 0; i < 8; i++)
-        {
-            BlackPawnPool.Get(out output);
-            BlackPawnPool.Release(output);
-            whitePawnPool.Get(out output);
-            whitePawnPool.Release(output);
-        }
+        CreateBasicPoolObject(BlackPawnPool, 8);
+        CreateBasicPoolObject(whitePawnPool, 8);
 
-        BlackRookPool.Get(out output);
-        BlackRookPool.Release(output);
-        BlackRookPool.Get(out output);
-        BlackRookPool.Release(output);
-        whiteRookPool.Get(out output);
-        whiteRookPool.Release(output);
-        whiteRookPool.Get(out output);
-        whiteRookPool.Release(output);
-        BlackKnightPool.Get(out output);
-        BlackKnightPool.Release(output);
-        BlackKnightPool.Get(out output);
-        BlackKnightPool.Release(output);
-        whiteKnightPool.Get(out output);
-        whiteKnightPool.Release(output);
-        whiteKnightPool.Get(out output);
-        whiteKnightPool.Release(output);
-        BlackBishopPool.Get(out output);
-        BlackBishopPool.Release(output);
-        BlackBishopPool.Get(out output);
-        BlackBishopPool.Release(output);
-        whiteBishopPool.Get(out output);
-        whiteBishopPool.Release(output);
-        whiteBishopPool.Get(out output);
-        whiteBishopPool.Release(output);
-
-        BlackQueenPool.Get(out output);
-        BlackQueenPool.Release(output);
-        whiteQueenPool.Get(out output);
-        whiteQueenPool.Release(output);
+        CreateBasicPoolObject(BlackRookPool, 2);
+        CreateBasicPoolObject(whiteRookPool, 2);
+        CreateBasicPoolObject(BlackKnightPool, 2);
+        CreateBasicPoolObject(whiteKnightPool, 2);
+        CreateBasicPoolObject(BlackBishopPool, 2);
+        CreateBasicPoolObject(whiteBishopPool, 2);
+        CreateBasicPoolObject(BlackQueenPool, 2);
+        CreateBasicPoolObject(whiteQueenPool, 2);
 
         if (BlackKing == null)
             BlackKing = Instantiate(BlackKingPrefab);
@@ -116,6 +88,18 @@ public class PieceManager : MonoBehaviour
             whiteKing = Instantiate(whiteKingPrefab);
         whiteKing.SetActive(false);
     }
+
+    public void CreateBasicPoolObject(ObjectPool<GameObject> pool, int number)
+    {
+        GameObject[] preCreationObjects = new GameObject[number];
+
+        for (int i = 0; i < number; i++)
+            preCreationObjects[i] = pool.Get();
+
+        for (int i = 0; i < number; i++)
+            pool.Release(preCreationObjects[i]);
+    }
+
 
     // ==============================================================================
     // Methods

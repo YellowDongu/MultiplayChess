@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class NetworkUI : MonoBehaviour
@@ -9,6 +10,10 @@ public class NetworkUI : MonoBehaviour
     void Start()
     {
         movement *= moveSpeed;
+        PanelUnFold();
+        resetButton.SetActive(false);
+        matchmakingPanel.SetActive(true);
+        endGamePanel.SetActive(false);
     }
 
 
@@ -21,8 +26,8 @@ public class NetworkUI : MonoBehaviour
     public void PanelUnFold() { StartCoroutine(UnFold()); }
     private IEnumerator UnFold()
     {
-        UnFoldButton.SetActive(false);
-        FoldButton.SetActive(true);
+        unFoldButton.SetActive(false);
+        foldButton.SetActive(true);
         while (panelTransform.anchoredPosition.x < 350.0f)
         {
             panelTransform.anchoredPosition += movement * Time.deltaTime;
@@ -33,8 +38,8 @@ public class NetworkUI : MonoBehaviour
     }
     private IEnumerator Fold()
     {
-        UnFoldButton.SetActive(true);
-        FoldButton.SetActive(false);
+        unFoldButton.SetActive(true);
+        foldButton.SetActive(false);
         while (panelTransform.anchoredPosition.x > -350.0f)
         {
             panelTransform.anchoredPosition -= movement * Time.deltaTime;
@@ -44,6 +49,26 @@ public class NetworkUI : MonoBehaviour
         panelTransform.anchoredPosition = new Vector2(-350.0f, 0.0f);
     }
 
+    public void LocalMode(bool active)
+    {
+        resetButton.SetActive(active);
+    }
+
+    public void AfterGamePanelActive(bool isWin)
+    {
+        endGameText.text = isWin ? "½Â¸®" : "ÆÐ¹è";
+        PanelUnFold();
+        matchmakingPanel.SetActive(false);
+        endGamePanel.SetActive(true);
+        rematchText.SetActive(false);
+    }
+
+    public void MatchmakingPanelActive()
+    {
+        matchmakingPanel.SetActive(true);
+        endGamePanel.SetActive(false);
+        PanelUnFold();
+    }
 
     // ==============================================================================
     // variable
@@ -51,8 +76,16 @@ public class NetworkUI : MonoBehaviour
 
 
     [SerializeField] private float moveSpeed = 5000.0f;
-    [SerializeField] private GameObject FoldButton = null;
-    [SerializeField] private GameObject UnFoldButton = null;
+    [SerializeField] private GameObject foldButton = null;
+    [SerializeField] private GameObject unFoldButton = null;
+    [SerializeField] private GameObject resetButton = null;
     [SerializeField] private RectTransform panelTransform = null;
+
+    [SerializeField] private GameObject matchmakingPanel = null;
+    [SerializeField] private GameObject endGamePanel = null;
+    [SerializeField] private GameObject rematchText = null;
+    [SerializeField] private TextMeshProUGUI endGameText = null;
+
+
     private Vector2 movement = new Vector2(1.0f, 0.0f);
 }

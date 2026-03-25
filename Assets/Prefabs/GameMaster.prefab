@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 110566285125194295}
   - component: {fileID: 7576529416135330768}
   - component: {fileID: 6359078366562371855}
-  - component: {fileID: 7015869023976803716}
+  - component: {fileID: 4586586478068477571}
+  - component: {fileID: 8239337548194107924}
+  - component: {fileID: 2966425222777862677}
   m_Layer: 0
   m_Name: GameMaster
   m_TagString: Untagged
@@ -47,7 +49,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameMaster
   boardManager: {fileID: 0}
-  handler: {fileID: 7015869023976803716}
+  pieceManager: {fileID: 0}
+  client: {fileID: 8239337548194107924}
+  host: {fileID: 2966425222777862677}
+  sidePanelUI: {fileID: 0}
   player: {fileID: 0}
 --- !u!114 &6359078366562371855
 MonoBehaviour:
@@ -61,8 +66,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 409362819
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 3968067360
+  InScenePlacedSourceGlobalObjectIdHash: 3711398064
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -74,7 +79,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &7015869023976803716
+--- !u!114 &4586586478068477571
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,10 +88,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 384821866809850635}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37420cbef9176dc408c187ffbd991015, type: 3}
+  m_Script: {fileID: 11500000, guid: a78076d055282da4db23e6b79031adee, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkManager
+  m_EditorClassIdentifier: Assembly-CSharp::MovementChecker
+--- !u!114 &8239337548194107924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384821866809850635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a6ecbbb8e9ef074db259d07827b6739, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClientHandler
   ipInput: {fileID: 0}
-  PlaceEvent:
-    m_PersistentCalls:
-      m_Calls: []
+--- !u!114 &2966425222777862677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384821866809850635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1506429f3389e84e9e132d7a812163c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HostHandler
+  varifier: {fileID: 4586586478068477571}
