@@ -176,10 +176,10 @@ public class NetworkHandler : MonoBehaviour
     private ushort port = 7777;
     private string ip = "127.0.0.1";
 
+
+    private NetworkDriver driver;
+    private NetworkConnection connection;
+
     [SerializeField] private TMP_InputField ipInput;
-
-    NetworkDriver driver;
-    NetworkConnection connection;
-
 
 }
