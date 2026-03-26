@@ -62,10 +62,10 @@ public class Queen : Piece
     {
         if (x == X)
         {
-            int i = Mathf.Min(y, Y);
-            i += Math.Sign(Y - y);
+            int i = Mathf.Min(y, Y) + 1;
+            int max = Mathf.Max(y, Y);
 
-            for (; i < Y; i++)
+            for (; i < max; i++)
             {
                 if (board[x, i].type != PieceType.END)
                     return false;
@@ -75,17 +75,16 @@ public class Queen : Piece
         }
         else if (y == Y)
         {
-            int i = Mathf.Min(x, X);
-            i += Math.Sign(X - x);
+            int i = Mathf.Min(x, X) + 1;
+            int max = Mathf.Max(x, X);
 
-            for (; i < X; i++)
+            for (; i < max; i++)
             {
                 if (board[i, y].type != PieceType.END)
                     return false;
             }
             return true;
         }
-
         else return Bishop.Validate(board, x, y, X, Y);
     }
 

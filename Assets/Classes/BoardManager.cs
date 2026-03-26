@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static PieceManager;
 
 public class BoardManager : MonoBehaviour
 {
@@ -103,6 +104,9 @@ public class BoardManager : MonoBehaviour
         to.SetPiece(piece);
         from.SetPiece(null);
 
+        if (piece.type == PieceType.Pawn)
+            ChangePawn(to);
+
         return true;
     }
 
@@ -117,6 +121,23 @@ public class BoardManager : MonoBehaviour
         piece.gameObject.transform.position = to.gameObject.transform.position;
         piece.SetPosition(to);
         to.SetPiece(piece);
+    }
+
+    public void ChangePawn(Tile tile, PieceType Type = PieceType.Queen) // 일단 퀸만, UI 준비가 되면 다른 말로도 선택 가능하게.
+    {
+        Piece piece = tile.GetPiece();
+        if (piece == null || piece.type != PieceType.Pawn)
+            return;
+
+        if (piece.isBlack && tile.GetPosition().y != 7)
+            return;
+        if (!piece.isBlack && tile.GetPosition().y != 0)
+            return;
+
+        tile.ReleasePiece();
+        GameObject newInstnace = GameMaster.GetInstance().GetNewPiece(PieceType.Queen, tile, piece.isBlack);
+        GameMaster.GetInstance().Log($"승급 : {GameMaster.GetInstance().GetPosition(tile.GetPosition())} 폰 -> 퀸");
+        //tile.SetPiece(newInstnace.GetComponent<Piece>());
     }
 
     public void ReCalculate() { StartCoroutine(CalculateAll()); }

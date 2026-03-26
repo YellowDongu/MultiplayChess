@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms;
 using UnityEngine.Windows;
+using static PieceManager;
 
 public class GameMaster : MonoBehaviour
 {
@@ -71,6 +72,8 @@ public class GameMaster : MonoBehaviour
         client.StartClient();
     }
 
+    public GameObject GetNewPiece(PieceType type, Tile spawnLocation, bool black) { return pieceManager.Get(type, spawnLocation, black); }
+
     public void RequestMove(Tile to, Tile from)
     {
         switch (networkState)
@@ -104,7 +107,8 @@ public class GameMaster : MonoBehaviour
         if (networkState == NetworkState.NULL)
             return;
 
-        Log($"{GetPosition(from)} -> {GetPosition(to)}, {(turn ? "ÈæÅÏ" : "¹éÅÏ")}");
+        Piece piece = boardManager.GetTile(from).GetPiece();
+        Log($" {GetPieceName(piece.type, piece.isBlack)} : {GetPosition(from)} -> {GetPosition(to)}, {(turn ? "ÈæÅÏ" : "¹éÅÏ")}");
         if (win != 0)
         {
             sidePanelUI.PanelUnFold();
@@ -112,7 +116,7 @@ public class GameMaster : MonoBehaviour
             EndGame();
             return;
         }
-
+            
         player.gameObject.SetActive(isBlack == turn);
     }
 
@@ -218,15 +222,44 @@ public class GameMaster : MonoBehaviour
 
     private void DebugStart()
     {
-        return; // manual
-        gameObject.GetComponent<MovementChecker>().Initialize(true);
+        //gameObject.GetComponent<MovementChecker>().Initialize(true); // manual
     }
     private void DebugMove(Tile from, Tile to)
     {
-        return; // manual
-        gameObject.GetComponent<MovementChecker>().Move(from.GetPosition().x, from.GetPosition().y, to.GetPosition().x, to.GetPosition().y);
+        Log($"{GetPieceName(from.GetPiece().type, from.GetPiece().isBlack)} : {GetPosition(from.GetPosition())} -> {GetPosition(to.GetPosition())}");
+        //gameObject.GetComponent<MovementChecker>().Move(from.GetPosition().x, from.GetPosition().y, to.GetPosition().x, to.GetPosition().y); // manual
     }
 
+    public string GetPieceName(PieceType type, bool isBlack)
+    {
+        string piece = isBlack ? "Èæ" : "¹é";
+
+        switch (type)
+        {
+            case PieceType.Pawn:
+                piece += "Æù";
+                break;
+            case PieceType.Rook:
+                piece += "·è";
+                break;
+            case PieceType.Knight:
+                piece += "³ªÀÌÆ®";
+                break;
+            case PieceType.Bishop:
+                piece += "ºñ¼ó";
+                break;
+            case PieceType.Queen:
+                piece += "Äý";
+                break;
+            case PieceType.King:
+                piece += "Å·";
+                break;
+            default:
+                piece += "??";
+                break;
+        }
+        return piece;
+    }
     public void PieceClear() { pieceManager.Clear(); }
     public void SetNetworkState(NetworkState state) { networkState = state; }
     public void Log(string text) { logUI.Log(text); }

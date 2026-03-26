@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 using static PieceManager;
 
 public class MovementChecker : MonoBehaviour
@@ -85,7 +86,12 @@ public class MovementChecker : MonoBehaviour
         switch (board[x, y].type)
         {
             case PieceType.Pawn:
-                return Pawn.Validate(board, x, y, toX, toY);
+                {
+                    bool result = Pawn.Validate(board, x, y, toX, toY);
+                    if (result)
+                        ChangePawn(x, y, toX, toY);
+                    return result;
+                }
             case PieceType.Rook:
                 return Rook.Validate(board, x, y, toX, toY);
             case PieceType.Knight:
@@ -99,6 +105,21 @@ public class MovementChecker : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    //public void ChangePawn(Vector2Int position, PieceType Type = PieceType.Queen)
+    public void ChangePawn(int x, int y, int toX, int toY, PieceType Type = PieceType.Queen) // 일단 퀸만, UI 준비가 되면 다른 말로도 선택 가능하게.
+    {
+        if (board[x, y].type != PieceType.Pawn)
+            return;
+
+        if (board[x, y].isBlack && toY != 7)
+            return;
+        if (!board[x, y].isBlack && toY != 0)
+            return;
+
+        board[x, y].type = Type;
+        board[x, y].type = PieceType.Queen; // remove later
     }
 
     public void TestEndTurn() { turn = !turn; }

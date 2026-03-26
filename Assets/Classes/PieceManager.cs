@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using System.Collections.Generic;
+using static PieceManager;
 
 public class PieceManager : MonoBehaviour
 {
@@ -249,7 +250,6 @@ public class PieceManager : MonoBehaviour
         Clear();
         Initialize();
     }
-
 
     // ==============================================================================
     // variables
