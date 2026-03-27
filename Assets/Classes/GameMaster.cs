@@ -95,6 +95,7 @@ public class GameMaster : MonoBehaviour
 
     public void ReceivedMove(Vector2Int from, Vector2Int to, bool currentTurn)
     {
+        Piece piece = boardManager.GetTile(from).GetPiece();
         Win(to);
         boardManager.MovePiece(from, to);
 
@@ -107,7 +108,6 @@ public class GameMaster : MonoBehaviour
         if (networkState == NetworkState.NULL)
             return;
 
-        Piece piece = boardManager.GetTile(from).GetPiece();
         Log($" {GetPieceName(piece.type, piece.isBlack)} : {GetPosition(from)} -> {GetPosition(to)}, {(turn ? "»Ê≈œ" : "πÈ≈œ")}");
         if (win != 0)
         {

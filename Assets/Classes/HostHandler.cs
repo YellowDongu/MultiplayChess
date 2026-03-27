@@ -167,8 +167,10 @@ public class HostHandler : NetworkHandler
         if (hostRematch && clientRematch)
         {
             bool hostIsWin = GameMaster.GetInstance().win == 1;
-            SendStart(hostIsWin ? true : false);
-            GameMaster.GetInstance().StartGame(GameMaster.NetworkState.Host, false, hostIsWin ? false : true);
+            bool ishostBlack = hostIsWin ? true : false;
+            varifier.Initialize(ishostBlack);
+            SendStart(ishostBlack);
+            GameMaster.GetInstance().StartGame(GameMaster.NetworkState.Host, false, ishostBlack);
         }
     }
 
